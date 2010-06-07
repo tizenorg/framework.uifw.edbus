@@ -1,10 +1,13 @@
 #ifndef E_HAL_H
 #define E_HAL_H
+
+#include <Eina.h>
 #include <E_DBus.h>
 
 #ifdef EAPI
-#undef EAPI
+# undef EAPI
 #endif
+
 #ifdef _MSC_VER
 # ifdef BUILDING_DLL
 #  define EAPI __declspec(dllexport)
@@ -22,6 +25,12 @@
 #  define EAPI
 # endif
 #endif
+
+/**
+ * @defgroup EHal_Group EHal
+ *
+ * @{
+ */
 
 #define E_HAL_SENDER "org.freedesktop.Hal"
 #define E_HAL_MANAGER_PATH "/org/freedesktop/Hal/Manager"
@@ -133,5 +142,9 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+/**
+ * @}
+ */
 
 #endif

@@ -10,8 +10,9 @@
 #include <E_DBus.h>
 
 #ifdef EAPI
-#undef EAPI
+# undef EAPI
 #endif
+
 #ifdef _MSC_VER
 # ifdef BUILDING_DLL
 #  define EAPI __declspec(dllexport)
@@ -29,6 +30,12 @@
 #  define EAPI
 # endif
 #endif
+
+/**
+ * @defgroup EConnman_Group EConnman
+ *
+ * @{
+ */
 
 #ifdef __cplusplus
 extern "C" {
@@ -322,4 +329,9 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+/**
+ * @}
+ */
+
 #endif /* E_CONNMAN_H */
