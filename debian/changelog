@@ -1,3 +1,11 @@
+edbus (0.5.0.060+svn.49544slp2+2) unstable; urgency=low
+
+  * Packaging.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL-pkgs/edbus
+  * Tag: edbus_0.5.0.060+svn.49544slp2+2
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.net>  Thu, 10 Jun 2010 20:46:08 +0900
+
 edbus (0.5.0.060+svn.49544slp2+1) unstable; urgency=low
 
   * Packaging.
