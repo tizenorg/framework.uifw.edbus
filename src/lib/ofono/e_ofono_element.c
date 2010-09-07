@@ -214,13 +214,13 @@ _e_ofono_element_listeners_call_do(E_Ofono_Element *element)
    e_ofono_element_event_add(E_OFONO_EVENT_ELEMENT_UPDATED, element);
 }
 
-static int
+static Eina_Bool
 _e_ofono_element_listeners_call_idler(void *data)
 {
    E_Ofono_Element *element = data;
    _e_ofono_element_listeners_call_do(element);
    element->_idler.changed = NULL;
-   return 0;
+   return ECORE_CALLBACK_CANCEL;
 }
 
 static void
@@ -757,7 +757,7 @@ e_ofono_element_bytes_array_get_stringshared(const E_Ofono_Element *element, con
 }
 
 Eina_Bool
-e_ofono_element_objects_array_get_stringshared(const E_Ofono_Element *element, const char *property, unsigned int *count, E_Ofono_Element ***elements)
+e_ofono_element_objects_array_get_stringshared(const E_Ofono_Element *element, const char *property, unsigned int *count, E_Ofono_Element ***p_elements)
 {
    E_Ofono_Element **ret, **p;
    Eina_Array_Iterator iterator;
@@ -769,10 +769,10 @@ e_ofono_element_objects_array_get_stringshared(const E_Ofono_Element *element, c
    EINA_SAFETY_ON_NULL_RETURN_VAL(element, 0);
    EINA_SAFETY_ON_NULL_RETURN_VAL(property, 0);
    EINA_SAFETY_ON_NULL_RETURN_VAL(count, 0);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(elements, 0);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(p_elements, 0);
 
    *count = 0;
-   *elements = NULL;
+   *p_elements = NULL;
 
    if (!e_ofono_element_property_get_stringshared
        (element, property, &type, &array))
@@ -813,7 +813,7 @@ e_ofono_element_objects_array_get_stringshared(const E_Ofono_Element *element, c
 	p++;
      }
    *count = p - ret;
-   *elements = ret;
+   *p_elements = ret;
    return 1;
 }
 
@@ -1933,7 +1933,7 @@ struct e_ofono_elements_for_each_data
    void *data;
 };
 
-Eina_Bool
+static Eina_Bool
 _e_ofono_elements_for_each(Eina_Hash *hash __UNUSED__, const char *key, void *data, void *fdata)
 {
    struct e_ofono_elements_for_each_data *each_data = fdata;
@@ -1981,7 +1981,7 @@ _e_ofono_elements_get_allocate(unsigned int *count, E_Ofono_Element ***p_element
    return 1;
 }
 
-Eina_Bool
+static Eina_Bool
 _e_ofono_elements_get_all(Eina_Hash *hash __UNUSED__, const char *key __UNUSED__, void *data, void *fdata)
 {
    E_Ofono_Element *element = data;
@@ -2030,7 +2030,7 @@ struct e_ofono_elements_get_all_str_data
    const char *str;
 };
 
-Eina_Bool
+static Eina_Bool
 _e_ofono_elements_get_all_type(Eina_Hash *hash __UNUSED__, const char *key __UNUSED__, void *e, void *user_data)
 {
    struct e_ofono_elements_get_all_str_data *data = user_data;
