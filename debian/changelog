@@ -14,6 +14,12 @@ edbus (1.0.0.001+svn.51480slp2+build01) unstable; urgency=low
 
  -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 31 Aug 2010 22:49:54 +0900
 
+edbus (0.5.0.060+svn.49544slp2+s1-3build05) unstable; urgency=low
+
+  * src/bin/Makefile/am fixed: added missed dependencies for the libedbus
+
+ -- Tomasz Fujak <t.fujak@samsung.com>  Thu, 09 Sep 2010 14:29:19 +0900
+
 edbus (0.5.0.060+svn.49544slp2+3build05) unstable; urgency=low
 
   * Packaging.
