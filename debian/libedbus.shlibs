@@ -1,0 +1,3 @@
+libedbus 1 libedbus (>= 0.5.0.060+svn20100304)
+libehal 1 libedbus (>= 0.5.0.060+svn20100304)
+libenotify 1 libedbus (>= 0.5.0.060+svn20100304)

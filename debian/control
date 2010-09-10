@@ -13,7 +13,7 @@ Homepage: http://enlightenment.org
 Package: libedbus-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends}, libedbus-svn-01 (= ${binary:Version}), libdbus-1-dev,
+Depends: ${misc:Depends}, libedbus (= ${binary:Version}), libdbus-1-dev,
  libeina-dev, libecore-dev, libevas-dev
 Description: D-Bus and HAL wrapper libraries for use with the EFL - Development files
  Wrappers around D-Bus to ease integrating D-Bus with EFL based applications.
@@ -21,7 +21,7 @@ Description: D-Bus and HAL wrapper libraries for use with the EFL - Development 
  This packages contains headers and static libraries for libedbus, libehal and
  libenotify
 
-Package: libedbus-svn-01
+Package: libedbus
 Conflicts: libedbus0
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
@@ -34,7 +34,7 @@ Description: D-Bus and HAL wrapper libraries for use with the EFL
 Package: libedbus-dbg
 Section: debug
 Architecture: any
-Depends: ${misc:Depends}, libedbus-svn-01 (= ${binary:Version})
+Depends: ${misc:Depends}, libedbus (= ${binary:Version})
 Description: D-Bus and HAL wrapper libraries for use with the EFL - Development files
  Wrappers around D-Bus to ease integrating D-Bus with EFL based applications.
  .

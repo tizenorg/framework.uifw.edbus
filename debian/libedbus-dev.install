@@ -1,7 +1,7 @@
-debian/tmp/usr/include/E_DBus.h
-debian/tmp/usr/include/E_Hal.h
-debian/tmp/usr/include/E_Notification_Daemon.h
-debian/tmp/usr/include/E_Notify.h
+debian/tmp/usr/include/e_dbus-1/E_DBus.h
+debian/tmp/usr/include/e_dbus-1/E_Hal.h
+debian/tmp/usr/include/e_dbus-1/E_Notification_Daemon.h
+debian/tmp/usr/include/e_dbus-1/E_Notify.h
 debian/tmp/usr/lib/pkgconfig/edbus.pc
 debian/tmp/usr/lib/pkgconfig/ehal.pc
 debian/tmp/usr/lib/pkgconfig/enotify.pc
