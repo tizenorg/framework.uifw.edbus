@@ -6,8 +6,8 @@ include /usr/share/cdbs/1/class/autotools.mk
 DEB_CONFIGURE_SCRIPT := ./autogen.sh
 DEB_MAKE_CLEAN_TARGET := distclean
 DEB_CONFIGURE_EXTRA_FLAGS :=
-CFLAGS += -fvisibility=hidden
-LDFLAGS += -fvisibility=hidden
+CFLAGS += -fvisibility=hidden -fPIC
+LDFLAGS += -fvisibility=hidden -Wl,--hash-style=both -Wl,--as-needed 
 
 clean::
 	[ ! -f Makefile ] || make distclean

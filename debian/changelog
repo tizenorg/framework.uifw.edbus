@@ -1,3 +1,11 @@
+edbus (1.0.0.001+svn.51480slp2+build02) unstable; urgency=low
+
+  * add as-needed
+  * Git: 165.213.180.234:/git/slp/pkgs/edbus
+  * Tag: edbus_1.0.0.001+svn.51480slp2+build02
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Wed, 15 Sep 2010 10:54:47 +0900
+
 edbus (1.0.0.001+svn.51480slp2+build01) unstable; urgency=low
 
   * efl 1.0 alpha upgrade
