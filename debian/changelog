@@ -1,3 +1,12 @@
+edbus (1.0.0.001+svn.51480slp2+build03) unstable; urgency=low
+
+  * [SVN 54772 Merge]
+  * Update to SVN Revision 54772.
+  * Git: 165.213.180.234:/git/slp/pkgs/edbus
+  * Tag: edbus_1.0.0.001+svn.51480slp2+build03
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Fri, 26 Nov 2010 15:48:48 +0900
+
 edbus (1.0.0.001+svn.51480slp2+build02) unstable; urgency=low
 
   * add as-needed
