@@ -1,3 +1,11 @@
+edbus (1.0.0.001+svn.55010slp2+build02) unstable; urgency=low
+
+  * Merged sbs-for-master.
+  * Git: 165.213.180.234:/git/slp/pkgs/edbus
+  * Tag: edbus_1.0.0.001+svn.55010slp2+build02
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Thu, 02 Dec 2010 17:34:33 +0900
+
 edbus (1.0.0.001+svn.55010slp2+build01) unstable; urgency=low
 
   * [SVN 55010 Merge]
