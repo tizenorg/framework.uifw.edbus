@@ -1,3 +1,11 @@
+edbus (1.0.0.001+svn.55238slp2+build02) unstable; urgency=low
+
+  * [src/bin/Makefile.am] Applied Rafal's patch.
+  * Git: 165.213.180.234:slp/pkgs/e/edbus
+  * Tag: edbus_1.0.0.001+svn.55238slp2+build02
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Wed, 15 Dec 2010 09:35:27 +0900
+
 edbus (1.0.0.001+svn.55238slp2+build01) unstable; urgency=low
 
   * [SVN's EFL Migration] e-dbus in SLP is merged with SVN r55238.
