@@ -1,3 +1,11 @@
+edbus (1.0.0.001+svn.55737slp2+build01) unstable; urgency=low
+
+  * [SVN EFL Migration] e_dbus in SLP is merged with SVN r55737
+  * Git: 165.213.180.234:slp/pkgs/e/edbus
+  * Tag: edbus_1.0.0.001+svn.55737slp2+build01
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Mon, 03 Jan 2011 21:23:09 +0900
+
 edbus (1.0.0.001+svn.55503slp2+build02) unstable; urgency=low
 
   * [src/bin/Makefile.am] Fixed build error in sbs.
