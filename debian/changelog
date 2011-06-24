@@ -1,3 +1,11 @@
+edbus (1.0.0.001+svn.60291slp2+build01) unstable; urgency=low
+
+  * [SVN EFL Migration] e_dbus in SLP is merged with SVN r60291
+  * Git: 165.213.180.234:slp/pkgs/e/edbus
+  * Tag: edbus_1.0.0.001+svn.60291slp2+build01
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Fri, 24 Jun 2011 18:10:30 +0900
+
 edbus (1.0.0.001+svn.58123slp2+build01) unstable; urgency=low
 
   * [SVN EFL Migration] e_dbus in SLP is merged with SVN r58123
