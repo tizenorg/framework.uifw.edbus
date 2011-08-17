@@ -53,32 +53,14 @@ rm -rf %{buildroot}
 
 %postun -p /sbin/ldconfig
 
-
-
-
-
 %files
 %defattr(-,root,root,-)
-%{_libdir}/libedbus.so.*
-%{_libdir}/libehal.so.*
-%{_libdir}/libenotify.so.*
-%{_libdir}/libeofono.so.*
-%{_libdir}/libeconnman.so.*
-%{_libdir}/libebluez.so.*
-%{_libdir}/libeukit.so.*
-/usr/bin/e-notify-send
-/usr/bin/e_dbus_*
-
+%{_libdir}/*.so.*
+%{_bindir}/*
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/e_dbus-1/*.h
-%{_libdir}/libedbus.so
-%{_libdir}/libehal.so
-%{_libdir}/libenotify.so
-%{_libdir}/libeofono.so
-%{_libdir}/libeconnman.so
-%{_libdir}/libebluez.so
-%{_libdir}/libeukit.so
-%{_libdir}/pkgconfig/e*.pc
+%{_libdir}/*.so
+%{_includedir}/*
+%{_libdir}/pkgconfig/*.pc
 
