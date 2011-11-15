@@ -20,3 +20,19 @@
 
         * Add support for notification protocol 1.2 into e_dbus by
         adding spec version string support.
+
+2011-10-27  Mike Blumenkrantz
+
+        * Added e_notification_action_id_get and e_notification_action_name_get
+
+2011-11-03  Mike Blumenkrantz
+
+        * Added more methods for manipulating notification hints
+
+2011-11-06  Mike Blumenkrantz
+
+        * Add e_notification_image_init for filling in values from an Evas_Object
+
+2011-11-11  Carsten Haitzler (The Rasterman)
+
+        * Fix DSO linking to edbus to include libdbus linking and includes

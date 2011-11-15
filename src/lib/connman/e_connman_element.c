@@ -4,18 +4,11 @@
 
 static Eina_Hash *elements = NULL;
 
-typedef struct _E_Connman_Array                E_Connman_Array;
 typedef struct _E_Connman_Element_Pending      E_Connman_Element_Pending;
 typedef struct _E_Connman_Element_Call_Data    E_Connman_Element_Call_Data;
 typedef struct _E_Connman_Element_Property     E_Connman_Element_Property;
 typedef struct _E_Connman_Element_Listener     E_Connman_Element_Listener;
 typedef struct _E_Connman_Element_Dict_Entry   E_Connman_Element_Dict_Entry;
-
-struct _E_Connman_Array
-{
-   int         type;
-   Eina_Array *array;
-};
 
 struct _E_Connman_Element_Pending
 {
@@ -56,12 +49,13 @@ struct _E_Connman_Element_Dict_Entry
    const char *name;
    int         type;
    union {
-      Eina_Bool      boolean;
-      const char    *str;
-      unsigned short u16;
-      unsigned int   u32;
-      unsigned char  byte;
-      const char    *path;
+      Eina_Bool        boolean;
+      const char      *str;
+      unsigned short   u16;
+      unsigned int     u32;
+      unsigned char    byte;
+      const char      *path;
+      E_Connman_Array *array;
    } value;
 };
 
@@ -178,27 +172,17 @@ e_connman_element_listener_del(E_Connman_Element *element, void (*cb)(void *data
 static void
 _e_connman_element_listeners_call_do(E_Connman_Element *element)
 {
-   E_Connman_Element_Listener *l, **shadow;
-   unsigned int i, count;
+   E_Connman_Element_Listener *l;
+   Eina_Inlist *x;
 
    /* NB: iterate on a copy in order to allow listeners to be deleted
     * from callbacks.  number of listeners should be small, so the
     * following should do fine.
     */
-   count = eina_inlist_count(element->_listeners);
-   if (count < 1)
-      goto end;
+   if (eina_inlist_count(element->_listeners) < 1) goto end;
 
-   shadow = alloca(sizeof(*shadow) * count);
-   if (!shadow)
-      goto end;
-
-   i = 0;
-   EINA_INLIST_FOREACH(element->_listeners, l)
-   shadow[i++] = l;
-
-   for (i = 0; i < count; i++)
-      shadow[i]->cb(shadow[i]->data, element);
+   EINA_INLIST_FOREACH_SAFE(element->_listeners, x, l)
+     l->cb(l->data, element);
 
 end:
    e_connman_element_event_add(E_CONNMAN_EVENT_ELEMENT_UPDATED, element);
@@ -379,14 +363,10 @@ _e_connman_element_array_free(E_Connman_Array *array, E_Connman_Array *new __UNU
       case DBUS_TYPE_UINT32:
          break;
 
+      case DBUS_TYPE_STRING:
       case DBUS_TYPE_OBJECT_PATH:
          EINA_ARRAY_ITER_NEXT(array->array, i, item, iterator)
-         eina_stringshare_del(item);
-         break;
-
-      case DBUS_TYPE_STRING:
-         EINA_ARRAY_ITER_NEXT(array->array, i, item, iterator)
-         eina_stringshare_del(item);
+            eina_stringshare_del(item);
          break;
 
       case DBUS_TYPE_DICT_ENTRY:
@@ -843,16 +823,14 @@ e_connman_element_objects_array_get_stringshared(const E_Connman_Element *elemen
    return EINA_TRUE;
 }
 
-/* strings are just pointers (references), no strdup or stringshare_add/ref */
+/* array and strings are just pointers (references),
+ * no malloc, strdup or stringshare_add/ref
+ */
 Eina_Bool
 e_connman_element_strings_array_get_stringshared(const E_Connman_Element *element, const char *property, unsigned int *count, const char ***strings)
 {
-   const char **ret, **p;
-   Eina_Array_Iterator iterator;
    E_Connman_Array *array;
-   unsigned int i;
    int type;
-   void *item;
 
    EINA_SAFETY_ON_NULL_RETURN_VAL(element, EINA_FALSE);
    EINA_SAFETY_ON_NULL_RETURN_VAL(property, EINA_FALSE);
@@ -881,28 +859,8 @@ e_connman_element_strings_array_get_stringshared(const E_Connman_Element *elemen
         return EINA_FALSE;
      }
 
-   *count = eina_array_count_get(array->array);
-   ret = malloc(*count * sizeof(char *));
-   if (!ret)
-     {
-        ERR("could not allocate return array of %d strings: %s",
-            *count, strerror(errno));
-        *count = 0;
-        return EINA_FALSE;
-     }
-
-   p = ret;
-
-   EINA_ARRAY_ITER_NEXT(array->array, i, item, iterator)
-   {
-      if (!item)
-         continue;
-
-      *p = item;
-      p++;
-   }
-   *count = p - ret;
-   *strings = ret;
+   *count = array->array->count;
+   *strings = (const char **)array->array->data;
    return EINA_TRUE;
 }
 
@@ -1595,6 +1553,77 @@ e_connman_element_property_set_full(E_Connman_Element *element, const char *prop
 }
 
 /**
+ * Call method SetProperty(prop, value) at the given element on server, when
+ * value is an array.
+ *
+ * This is a server call, not local, so it may fail and in that case
+ * no property is updated locally. If the value was set the event
+ * E_CONNMAN_EVENT_ELEMENT_UPDATED will be added to main loop.
+ *
+ * @param element to call method on server.
+ * @param prop property name.
+ * @param type DBus type to use for value.
+ * @param value pointer to value, just like regular DBus, see
+ *        dbus_message_iter_append_basic().
+ * @param cb function to call when server replies or some error happens.
+ * @param data data to give to cb when it is called.
+ *
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise.
+ */
+Eina_Bool
+e_connman_element_property_array_set_full(E_Connman_Element *element, const char *prop, int type, unsigned int count, const void * const *values, E_DBus_Method_Return_Cb cb, const void *data)
+{
+   const char name[] = "SetProperty";
+   char type_sig[2] = { type, '\0'};
+   char array_sig[3] = { DBUS_TYPE_ARRAY, type, '\0' };
+   DBusMessage *msg;
+   DBusMessageIter itr, variant, array;
+
+   EINA_SAFETY_ON_NULL_RETURN_VAL(element, EINA_FALSE);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(prop, EINA_FALSE);
+
+   msg = dbus_message_new_method_call
+         (e_connman_system_bus_name_get(), element->path, element->interface, name);
+
+   if (!msg)
+      return EINA_FALSE;
+
+   dbus_message_iter_init_append(msg, &itr);
+   dbus_message_iter_append_basic(&itr, DBUS_TYPE_STRING, &prop);
+
+   dbus_message_iter_open_container(&itr, DBUS_TYPE_VARIANT, array_sig,
+                                    &variant);
+   dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY, type_sig,
+                                    &array);
+
+   if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH)
+     {
+        unsigned int i;
+        for (i = 0; i < count; i++)
+          {
+             const void *entry = values[i];
+             dbus_message_iter_append_basic(&array, type, &entry);
+          }
+     }
+   else
+     {
+        unsigned int i;
+        for (i = 0; i < count; i++)
+          {
+             const void *entry = values[i];
+             dbus_message_iter_append_basic(&array, type, entry);
+          }
+     }
+
+   dbus_message_iter_close_container(&variant, &array);
+   dbus_message_iter_close_container(&itr, &variant);
+
+   return e_connman_element_message_send(element, name, NULL, msg,
+                                         &element->_pending.property_set,
+                                         cb, data);
+}
+
+/**
  * Call method SetProperty(prop, value) at the given element on server.
  *
  * This is the simple version and there is no check of server reply
@@ -1858,6 +1887,10 @@ e_connman_element_property_dict_get_stringshared(const E_Connman_Element *elemen
             *(const char **)value = entry->value.path;
             return EINA_TRUE;
 
+         case DBUS_TYPE_ARRAY:
+            *(E_Connman_Array **)value = entry->value.array;
+            return EINA_TRUE;
+
          default:
             ERR("don't know how to get property %s, key %s type %c (%d)",
                 dict_name, key, entry->type, entry->type);
@@ -1865,9 +1898,72 @@ e_connman_element_property_dict_get_stringshared(const E_Connman_Element *elemen
         }
    }
 
-   WRN("element %s (%p) has no property with name \"%s\".",
+   DBG("element %s (%p) has no property with name \"%s\".",
        element->path, element, dict_name);
    return EINA_FALSE;
+}
+
+Eina_Bool
+e_connman_element_property_dict_strings_array_get_stringshared(const E_Connman_Element *element, const char *dict_name, const char *key, unsigned int *count, const char ***strings)
+{
+   const char **ret, **p;
+   Eina_Array_Iterator iterator;
+   E_Connman_Array *array;
+   unsigned int i;
+   int type;
+   void *item;
+
+   EINA_SAFETY_ON_NULL_RETURN_VAL(element, EINA_FALSE);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(dict_name, EINA_FALSE);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(key, EINA_FALSE);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(count, EINA_FALSE);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(strings, EINA_FALSE);
+
+   *count = 0;
+   *strings = NULL;
+
+   if (!e_connman_element_property_dict_get_stringshared(element, dict_name,
+                                                         key, &type, &array))
+      return EINA_FALSE;
+
+   if (type != DBUS_TYPE_ARRAY)
+     {
+        ERR("property %s.%s is not an array!", dict_name, key);
+        return EINA_FALSE;
+     }
+
+   if ((!array) || (!array->array) || (array->type == DBUS_TYPE_INVALID))
+      return EINA_FALSE;
+
+   if (array->type != DBUS_TYPE_STRING)
+     {
+        ERR("property %s.%s is not an array of strings!", dict_name, key);
+        return EINA_FALSE;
+     }
+
+   *count = eina_array_count_get(array->array);
+   ret = malloc(*count * sizeof(char *));
+   if (!ret)
+     {
+        ERR("could not allocate return array of %d strings: %s",
+            *count, strerror(errno));
+        *count = 0;
+        return EINA_FALSE;
+     }
+
+   p = ret;
+
+   EINA_ARRAY_ITER_NEXT(array->array, i, item, iterator)
+     {
+        if (!item)
+           continue;
+
+        *p = item;
+        p++;
+     }
+   *count = p - ret;
+   *strings = ret;
+   return EINA_TRUE;
 }
 
 /**
