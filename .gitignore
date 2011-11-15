@@ -49,3 +49,14 @@ Makefile.in
 /src/bin/e_dbus_ukit_test
 /stamp-h1
 /doc/Doxyfile
+config.guess.cdbs-orig
+config.sub.cdbs-orig
+debian/files
+debian/*.log
+debian/*.substvars
+debian/*.debhelper
+debian/stamp-*
+debian/libedbus-dbg/
+debian/libedbus-dev/
+debian/libedbus/
+debian/tmp/
