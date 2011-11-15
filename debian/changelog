@@ -1,3 +1,9 @@
+edbus (1.0.0.001+svn.65213slp2+build01) unstable; urgency=low
+
+  * Merge with upstream @65213
+
+ -- Mike McCormack <mj.mccormack@samsung.com>  Tue, 15 Nov 2011 18:02:54 +0900
+
 edbus (1.0.0.001+svn.62640slp2+build01) unstable; urgency=low
 
   * [SVN EFL Migration] e_dbus in SLP is merged with SVN r62640
