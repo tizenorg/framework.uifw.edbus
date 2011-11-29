@@ -1,3 +1,11 @@
+edbus (1.0.0.001+svn.65617slp2+build01) unstable; urgency=low
+
+  * Package Upload
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/edbus
+  * Tag: edbus_1.0.0.001+svn.65617slp2+build01
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 29 Nov 2011 14:13:40 +0900
+
 edbus (1.0.0.001+svn.65213slp2+build01) unstable; urgency=low
 
   * Merge with upstream @65213
