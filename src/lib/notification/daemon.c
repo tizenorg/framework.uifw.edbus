@@ -5,6 +5,8 @@
 #include "E_Notify.h"
 #include "E_Notification_Daemon.h"
 #include "e_notify_private.h"
+
+#include <stdlib.h>
 #include <string.h>
 
 static int init_count = 0;
@@ -91,6 +93,7 @@ e_notification_daemon_add(const char *name, const char *vendor)
 {
    E_Notification_Daemon *ndaemon;
 
+   loginit();
    ndaemon = calloc(1, sizeof(E_Notification_Daemon));
    if (ndaemon)
      e_notification_daemon_bus_init(ndaemon);
