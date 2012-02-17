@@ -5,14 +5,10 @@
 #include "E_Notify.h"
 #include "E_Notification_Daemon.h"
 #include "e_notify_private.h"
+
+#include <stdlib.h>
 #include <string.h>
 
-#define DBG(...)  EINA_LOG_DOM_DBG(log_dom, __VA_ARGS__)
-#define INF(...)  EINA_LOG_DOM_INFO(log_dom, __VA_ARGS__)
-#define WRN(...)  EINA_LOG_DOM_WARN(log_dom, __VA_ARGS__)
-#define ERR(...)  EINA_LOG_DOM_ERR(log_dom, __VA_ARGS__)
-#define CRIT(...) EINA_LOG_DOM_CRITICAL(log_dom, __VA_ARGS__)
-static int log_dom = -1;
 static int init_count = 0;
 static E_DBus_Interface *daemon_iface = NULL;
 
@@ -78,14 +74,6 @@ e_notification_daemon_init(void)
 {
    if (init_count) return ++init_count;
    if (!e_dbus_init()) return 0;
-   log_dom = eina_log_domain_register
-       ("e_dbus_notification_daemon", E_DBUS_COLOR_DEFAULT);
-   if (log_dom < 0)
-     {
-        ERR("Impossible to create e_dbus_notification_daemon domain");
-        e_dbus_shutdown();
-        return 0;
-     }
 
    daemon_iface = e_dbus_interface_new(E_NOTIFICATION_INTERFACE);
 
@@ -96,7 +84,6 @@ EAPI int
 e_notification_daemon_shutdown(void)
 {
    if (--init_count) return init_count;
-   eina_log_domain_unregister(log_dom);
    e_dbus_shutdown();
    return 0;
 }
@@ -106,6 +93,7 @@ e_notification_daemon_add(const char *name, const char *vendor)
 {
    E_Notification_Daemon *ndaemon;
 
+   loginit();
    ndaemon = calloc(1, sizeof(E_Notification_Daemon));
    if (ndaemon)
      e_notification_daemon_bus_init(ndaemon);

@@ -52,8 +52,8 @@
  *
  * EDbus is a wrapper around the
  * <a href="http://www.freedesktop.org/wiki/Software/dbus">dbus</a>
- * library, which is a message bus system. It also implement a set of
- * specifications using dbus as interprocess comunication.
+ * library, which is a message bus system. It also implements a set of
+ * specifications using dbus as interprocess communication.
  *
  * @section edbus_modules_sec Modules
  *
@@ -101,7 +101,7 @@ extern "C" {
 #endif
    
 #define E_DBUS_VERSION_MAJOR 1
-#define E_DBUS_VERSION_MINOR 0
+#define E_DBUS_VERSION_MINOR 2
    
    typedef struct _E_DBus_Version
      {
