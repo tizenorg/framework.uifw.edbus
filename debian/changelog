@@ -1,3 +1,11 @@
+edbus (1.0.0.001+svn.68464slp2+build01) unstable; urgency=low
+
+  * Package Upload
+  * Git: slp/pkgs/e/edbus
+  * Tag: edbus_1.0.0.001+svn.68464slp2+build01
+
+ -- Jeonghyun Yun <jh0506.yun@samsung.com>  Fri, 02 Mar 2012 06:33:54 -0500
+
 edbus (1.0.0.001+svn.67284slp2+build01) unstable; urgency=low
 
   * Package Upload
