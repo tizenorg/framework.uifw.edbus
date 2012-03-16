@@ -1,3 +1,11 @@
+edbus (1.0.0.001+svn.69376slp2+build01) unstable; urgency=low
+
+  * EFL migration
+  * Git: slp/pkgs/e/edbus
+  * Tag: edbus_1.0.0.001+svn.69376slp2+build01
+
+ -- Jeonghyun Yun <jh0506.yun@samsung.com>  Fri, 16 Mar 2012 21:51:11 +0900
+
 edbus (1.0.0.001+svn.69045slp2+build01) unstable; urgency=low
 
   * Package Upload
