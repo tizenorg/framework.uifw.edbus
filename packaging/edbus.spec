@@ -3,8 +3,8 @@ Name:       edbus
 Summary:    D-Bus and HAL wrapper libraries for EFL
 Version:    1.0.0.001+svn.69484slp2+build01
 Release:    1
-Group:      TO_BE/FILLED_IN
-License:    TO BE FILLED IN
+Group:      System/Libraries
+License:    BSD
 Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
