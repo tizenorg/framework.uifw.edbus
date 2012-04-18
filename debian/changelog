@@ -1,3 +1,11 @@
+edbus (1.2.0+svn.70217slp2+build01) unstable; urgency=low
+
+  * Package Upload
+  * Git: slp/pkgs/e/edbus
+  * Tag: edbus_1.2.0+svn.70217slp2+build01
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Wed, 18 Apr 2012 18:12:12 +0900
+
 edbus (1.2.0+svn.69484slp2+build01) unstable; urgency=low
 
   * Package Upload
