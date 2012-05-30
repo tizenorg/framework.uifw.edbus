@@ -6,6 +6,7 @@ Release:    1
 Group:      System/Libraries
 License:    BSD
 Source0:    %{name}-%{version}.tar.gz
+Source1001: packaging/edbus.manifest 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig(ecore)
@@ -33,6 +34,7 @@ D-Bus and HAL wrapper libraries for use with the EFL (devel)
 
 
 %build
+cp %{SOURCE1001} .
 export CFLAGS+=" -fvisibility=hidden -fPIC"
 export LDFLAGS+=" -fvisibility=hidden -Wl,--hash-style=both -Wl,--as-needed"
 
@@ -51,6 +53,7 @@ rm -rf %{buildroot}
 %postun -p /sbin/ldconfig
 
 %files
+%manifest edbus.manifest
 %defattr(-,root,root,-)
 %{_bindir}/e-*
 %{_bindir}/e_*
@@ -58,6 +61,7 @@ rm -rf %{buildroot}
 /usr/share/e_dbus/logo.png
 
 %files devel
+%manifest edbus.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libebluez.so
 %{_libdir}/libeconnman0_7x.so
