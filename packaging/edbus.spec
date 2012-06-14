@@ -2,16 +2,16 @@
 Name:       edbus
 Summary:    D-Bus and HAL wrapper libraries for EFL
 Version:    1.2.0+svn.70375slp2+build02
-Release:    1
+Release:    2
 Group:      System/Libraries
 License:    BSD
 Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-BuildRequires:  pkgconfig(ecore)
-BuildRequires:  pkgconfig(eina)
-BuildRequires:  pkgconfig(evas)
-BuildRequires:  pkgconfig(dbus-1)
+BuildRequires:  ecore-devel
+BuildRequires:  eina-devel
+BuildRequires:  evas-devel
+BuildRequires:  dbus-devel
 
 
 %description
