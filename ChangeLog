@@ -61,3 +61,13 @@
 
         1.2.0 release
 
+2012-07-05 José Roberto de Souza
+
+        * Use idler instead of idle_enterer for processing messages
+        * Listen and update the 'sender unique name' of signals
+
+2012-07-13 José Roberto de Souza
+
+        * Fix properties handling
+        * Check if interface already exists before attaching
+        * Fix missing DBus.Properties attach
