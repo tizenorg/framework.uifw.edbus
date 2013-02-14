@@ -1,12 +1,15 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <stdio.h>
 #include <stdlib.h>
-#include "E_DBus.h"
+
 #include "e_dbus_private.h"
 
 typedef struct E_DBus_Pending_Call_Data E_DBus_Pending_Call_Data;
 struct E_DBus_Pending_Call_Data
 {
-  int                     serial;
-
   E_DBus_Method_Return_Cb cb_return;
   void                   *data;
 };
@@ -20,7 +23,9 @@ cb_pending(DBusPendingCall *pending, void *user_data)
 
   if (!dbus_pending_call_get_completed(pending))
   {
-    printf("NOT COMPLETED\n");
+    INFO("E-dbus: NOT COMPLETED");
+    free(data);
+    dbus_pending_call_unref(pending);
     return;
   }
 
@@ -54,31 +59,33 @@ cb_pending(DBusPendingCall *pending, void *user_data)
 }
 
 
-/**
- * @brief Send a DBus message with callbacks
- * @param conn The DBus connection
- * @param msg  The message to send
- * @param cb_return A callback function for returns (only used if @a msg is a method-call)
- * @param timeout   A timeout in milliseconds, after which a synthetic error will be generated
- * @return a DBusPendingCall that can be used to cancel the current call
- */
 EAPI DBusPendingCall *
 e_dbus_message_send(E_DBus_Connection *conn, DBusMessage *msg, E_DBus_Method_Return_Cb cb_return, int timeout, void *data)
 {
-  DBusPendingCall *pending;
+  DBusPendingCall *pending = NULL;
 
+  EINA_SAFETY_ON_NULL_RETURN_VAL(conn, NULL);
   if (!dbus_connection_send_with_reply(conn->conn, msg, &pending, timeout))
     return NULL;
 
-  if (cb_return)
+  if (cb_return && pending)
   {
     E_DBus_Pending_Call_Data *pdata;
 
-    pdata = calloc(1, sizeof(E_DBus_Pending_Call_Data));
-    pdata->cb_return = cb_return;
-    pdata->data = data;
+    pdata = malloc(sizeof(E_DBus_Pending_Call_Data));
+    if (pdata)
+    {
+      pdata->cb_return = cb_return;
+      pdata->data = data;
 
-    dbus_pending_call_set_notify(pending, cb_pending, pdata, free);
+      if (!dbus_pending_call_set_notify(pending, cb_pending, pdata, free))
+      {
+        free(pdata);
+        dbus_message_unref(msg);
+        dbus_pending_call_cancel(pending);
+        return NULL;
+      }
+    }
   }
 
   return pending;
@@ -111,6 +118,8 @@ EAPI DBusPendingCall *
 e_dbus_method_call_send(E_DBus_Connection *conn, DBusMessage *msg, E_DBus_Unmarshal_Func unmarshal_func, E_DBus_Callback_Func cb_func, E_DBus_Free_Func free_func, int timeout, void *data)
 {
   E_DBus_Callback *cb;
+
+  EINA_SAFETY_ON_NULL_RETURN_VAL(conn, NULL);
   cb = e_dbus_callback_new(cb_func, unmarshal_func, free_func, data);
   return e_dbus_message_send(conn, msg, cb_method_call, timeout, cb);
 }
