@@ -1,30 +1,15 @@
 #ifndef E_NOTIFY_H
 #define E_NOTIFY_H
 
-#include <Ecore_Data.h>
+#include <Eina.h>
 #include <Evas.h>
 #include <E_DBus.h>
 
-#ifdef EAPI
-#undef EAPI
-#endif
-#ifdef _MSC_VER
-# ifdef BUILDING_DLL
-#  define EAPI __declspec(dllexport)
-# else
-#  define EAPI __declspec(dllimport)
-# endif
-#else
-# ifdef __GNUC__
-#  if __GNUC__ >= 4
-#   define EAPI __attribute__ ((visibility("default")))
-#  else
-#   define EAPI
-#  endif
-# else
-#  define EAPI
-# endif
-#endif
+/**
+ * @defgroup ENotify_Group ENotify
+ *
+ * @{
+ */
 
 
 /* notifications */
@@ -65,10 +50,13 @@ enum E_Notification_Closed_Reason
 
 enum E_Notification_Hint_Type
 {
-  E_NOTIFICATION_HINT_URGENCY        = 0x1,
-  E_NOTIFICATION_HINT_CATEGORY       = 0x2,
-  E_NOTIFICATION_HINT_DESKTOP        = 0x4,
-  E_NOTIFICATION_HINT_SOUND_FILE     = 0x8,
+  E_NOTIFICATION_HINT_URGENCY        = (1 << 0),
+  E_NOTIFICATION_HINT_CATEGORY       = (1 << 1),
+  E_NOTIFICATION_HINT_DESKTOP        = (1 << 2),
+  E_NOTIFICATION_HINT_SOUND_FILE     = (1 << 3),
+  E_NOTIFICATION_HINT_TRANSIENT      = (1 << 4),
+  E_NOTIFICATION_HINT_RESIDENT       = (1 << 5),
+  E_NOTIFICATION_HINT_ACTION_ICONS   = (1 << 6),
   E_NOTIFICATION_HINT_SUPPRESS_SOUND = 0x10,
   E_NOTIFICATION_HINT_XY             = 0x20,
   E_NOTIFICATION_HINT_IMAGE_DATA     = 0x40
@@ -83,7 +71,7 @@ struct E_Notification_Return_Notify
 
 struct E_Notification_Return_Get_Capabilities
 {
-  Ecore_List *capabilities;
+  Eina_List *capabilities;
 };
 
 struct E_Notification_Return_Get_Server_Information
@@ -91,6 +79,7 @@ struct E_Notification_Return_Get_Server_Information
   const char *name;
   const char *vendor;
   const char *version;
+  const char *spec_version;
 };
 
 /* signals */
@@ -110,8 +99,8 @@ struct E_Notification_Event_Action_Invoked
 extern "C" {
 #endif
 
-   EAPI int e_notification_init();
-   EAPI int e_notification_shutdown();
+   EAPI int e_notification_init(void);
+   EAPI int e_notification_shutdown(void);
 
 /* client */
    EAPI void e_notification_send(E_Notification *n, E_DBus_Callback_Func func, void *data);
@@ -121,7 +110,7 @@ extern "C" {
 
 /* Notifications */
 
-   EAPI E_Notification *e_notification_new();
+   EAPI E_Notification *e_notification_new(void);
    EAPI void e_notification_ref(E_Notification *n);
    EAPI void e_notification_unref(E_Notification *n);
    EAPI void e_notification_free(E_Notification *n);
@@ -155,9 +144,15 @@ extern "C" {
 
 /* actions */
    EAPI void e_notification_action_add(E_Notification *n, const char *action_id, const char *action_name);
-   EAPI Ecore_List *e_notification_actions_get(E_Notification *n);
+   EAPI Eina_List *e_notification_actions_get(E_Notification *n);
+   EAPI const char *e_notification_action_id_get(E_Notification_Action *a);
+   EAPI const char *e_notification_action_name_get(E_Notification_Action *a);
 
 /* hint mutators */
+   EAPI void e_notification_hint_transient_set(E_Notification *n, Eina_Bool transient);
+   EAPI void e_notification_hint_resident_set(E_Notification *n, Eina_Bool resident);
+   EAPI void e_notification_hint_action_icons_set(E_Notification *n, Eina_Bool action_icons);
+   EAPI void e_notification_hint_image_path_set(E_Notification *n, const char *path);
    EAPI void e_notification_hint_urgency_set(E_Notification *n, char urgency);
    EAPI void e_notification_hint_category_set(E_Notification *n, const char *category);
    EAPI void e_notification_hint_desktop_set(E_Notification *n, const char *desktop);
@@ -171,18 +166,25 @@ extern "C" {
    EAPI const char *e_notification_hint_category_get(E_Notification *n);
    EAPI const char *e_notification_hint_desktop_get(E_Notification *n);
    EAPI const char *e_notification_hint_sound_file_get(E_Notification *n);
+   EAPI const char *e_notification_hint_image_path_get(E_Notification *n);
    EAPI char  e_notification_hint_suppress_sound_get(E_Notification *n);
    EAPI int   e_notification_hint_xy_get(E_Notification *n, int *x, int *y);
    EAPI E_Notification_Image *e_notification_hint_image_data_get(E_Notification *n);
+   /* icon_data is deprecated, we do not support setting it */
    EAPI E_Notification_Image *e_notification_hint_icon_data_get(E_Notification *n);
 
 /* image hint */
-   EAPI E_Notification_Image *e_notification_image_new();
+   EAPI E_Notification_Image *e_notification_image_new(void);
    EAPI void e_notification_image_free(E_Notification_Image *img);
+   EAPI Eina_Bool e_notification_image_init(E_Notification_Image *img, Evas_Object *obj) EINA_WARN_UNUSED_RESULT;
    EAPI Evas_Object *e_notification_image_evas_object_add(Evas *evas, E_Notification_Image *img);
 
 #ifdef __cplusplus
 }
 #endif
+
+/**
+ * @}
+ */
 
 #endif

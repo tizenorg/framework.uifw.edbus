@@ -2,7 +2,7 @@
 #define E_NOTIFICATION_DAEMON_H
 
 #define E_NOTIFICATION_DAEMON_VERSION "0.9"
-
+#define E_NOTIFICATION_DAEMON_SUPPORTS_SPEC_VERSION "1.2"
 #include <E_Notify.h>
 
 #ifdef EAPI
@@ -58,6 +58,9 @@ struct E_Notification_Daemon
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+  EAPI int e_notification_daemon_init(void);
+  EAPI int e_notification_daemon_shutdown(void);
 
 /* daemon */
    EAPI E_Notification_Daemon *e_notification_daemon_add(const char *name, const char *vendor);
