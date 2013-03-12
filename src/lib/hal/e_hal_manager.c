@@ -1,4 +1,7 @@
+#include <stdlib.h>
+
 #include "E_Hal.h"
+#include "e_hal_private.h"
 
 #define e_hal_manager_call_new(member) dbus_message_new_method_call(E_HAL_SENDER, E_HAL_MANAGER_PATH, E_HAL_MANAGER_INTERFACE, member)
 
@@ -23,13 +26,7 @@ unmarshal_string_list(DBusMessage *msg, DBusError *err)
     return NULL;
   }
 
-  ret->strings = ecore_list_new();
-  if (!ret->strings)
-  {
-    dbus_set_error(err, DBUS_ERROR_NO_MEMORY, "");
-    free(ret);
-    return NULL;
-  }
+  ret->strings = NULL;
 
   dbus_message_iter_init(msg, &iter);
   dbus_message_iter_recurse(&iter, &sub);
@@ -38,7 +35,8 @@ unmarshal_string_list(DBusMessage *msg, DBusError *err)
     char *dev = NULL;
 
     dbus_message_iter_get_basic(&sub, &dev);
-    if (dev) ecore_list_append(ret->strings, dev);
+    if (dev)
+      ret->strings = eina_list_append(ret->strings, eina_stringshare_add(dev));
     dbus_message_iter_next(&sub);
   }
 
@@ -49,20 +47,22 @@ static void
 free_string_list(void *data)
 {
   E_Hal_String_List_Return *ret = data;
+  const char *str;
 
   if (!ret) return;
-  ecore_list_destroy(ret->strings);
+  EINA_LIST_FREE(ret->strings, str)
+    eina_stringshare_del(str);
   free(ret);
 }
 
-EAPI int
+EAPI DBusPendingCall *
 e_hal_manager_get_all_devices(E_DBus_Connection *conn, E_DBus_Callback_Func cb_func, void *data)
 {
   DBusMessage *msg;
-  int ret;
+  DBusPendingCall *ret;
 
   msg = e_hal_manager_call_new("GetAllDevices");
-  ret = e_dbus_method_call_send(conn, msg, unmarshal_string_list, cb_func, free_string_list, -1, data) ? 1 : 0;
+  ret = e_dbus_method_call_send(conn, msg, unmarshal_string_list, cb_func, free_string_list, -1, data);
   dbus_message_unref(msg);
   return ret;
 }
@@ -103,44 +103,44 @@ free_manager_device_exists(void *data)
   free(ret);
 }
 
-EAPI int
+EAPI DBusPendingCall *
 e_hal_manager_device_exists(E_DBus_Connection *conn, const char *udi, E_DBus_Callback_Func cb_func, void *data)
 {
-  int ret;
+  DBusPendingCall *ret;
   DBusMessage *msg;
 
   msg = e_hal_manager_call_new("DeviceExists");
   dbus_message_append_args(msg, DBUS_TYPE_STRING, &udi, DBUS_TYPE_INVALID);
-  ret = e_dbus_method_call_send(conn, msg, unmarshal_manager_device_exists, cb_func, free_manager_device_exists, -1, data) ? 1 : 0;
+  ret = e_dbus_method_call_send(conn, msg, unmarshal_manager_device_exists, cb_func, free_manager_device_exists, -1, data);
   dbus_message_unref(msg);
   return ret;
 }
 
 /* Manager.FindDeviceStringMatch */
-EAPI int
+EAPI DBusPendingCall *
 e_hal_manager_find_device_string_match(E_DBus_Connection *conn, const char *key, const char *value, E_DBus_Callback_Func cb_func, void *data)
 {
   DBusMessage *msg;
-  int ret;
+  DBusPendingCall *ret;
 
   msg = e_hal_manager_call_new("FindDeviceStringMatch");
   dbus_message_append_args(msg, DBUS_TYPE_STRING, &key, DBUS_TYPE_STRING, &value, DBUS_TYPE_INVALID);
-  ret = e_dbus_method_call_send(conn, msg, unmarshal_string_list, cb_func, free_string_list, -1, data) ? 1 : 0;
+  ret = e_dbus_method_call_send(conn, msg, unmarshal_string_list, cb_func, free_string_list, -1, data);
   dbus_message_unref(msg);
   return ret;
 }
 
 /* Manager.FindDeviceByCapability */
 
-EAPI int
+EAPI DBusPendingCall *
 e_hal_manager_find_device_by_capability(E_DBus_Connection *conn, const char *capability, E_DBus_Callback_Func cb_func, void *data)
 {
   DBusMessage *msg;
-  int ret;
+  DBusPendingCall *ret;
 
   msg = e_hal_manager_call_new("FindDeviceByCapability");
   dbus_message_append_args(msg, DBUS_TYPE_STRING, &capability, DBUS_TYPE_INVALID);
-  ret = e_dbus_method_call_send(conn, msg, unmarshal_string_list, cb_func, free_string_list, -1, data) ? 1 : 0;
+  ret = e_dbus_method_call_send(conn, msg, unmarshal_string_list, cb_func, free_string_list, -1, data);
   dbus_message_unref(msg);
   return ret;
 }
