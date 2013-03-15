@@ -1,7 +1,7 @@
 #sbs-git:slp/pkgs/e/edbus edbus 1.0.0.001+svn.69045slp2+build01 706f4acfdaf1b818e2387701a993eca929051358
 Name:       edbus
 Summary:    D-Bus and HAL wrapper libraries for EFL
-Version:    1.7.1+svn.76526+build01r01
+Version:    1.7.1+svn.76526slp2+build01
 Release:    1
 Group:      System/Libraries
 License:    BSD
