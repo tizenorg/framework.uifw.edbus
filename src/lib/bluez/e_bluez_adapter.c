@@ -62,7 +62,10 @@ _device_found_callback(void *data, DBusMessage *msg)
    value = e_bluez_element_iter_get_array(&itr, name);
 
    if (!value)
-      return;
+     {
+        free(device);
+        return;
+     }
 
    device->name = eina_stringshare_add(name);
    device->adapter = element;

@@ -6,7 +6,9 @@
 #include <E_DBus.h>
 
 /**
+ * @internal
  * @defgroup ENotify_Group ENotify
+ * @ingroup EDbus_Group
  *
  * @{
  */

@@ -2,17 +2,4 @@
 	<request>
 		<domain name="_"/>
 	</request>
-	<assign>
-		<filesystem path="/usr/bin/e_dbus_async_client_test" exec_label="none" />
-		<filesystem path="/usr/bin/e_dbus_async_server_test" exec_label="none" />
-		<filesystem path="/usr/bin/e_dbus_bluez_test" exec_label="none" />
-		<filesystem path="/usr/bin/e_dbus_connman0_7x_test" exec_label="none" />
-		<filesystem path="/usr/bin/e_dbus_notification_daemon" exec_label="none" />
-		<filesystem path="/usr/bin/e_dbus_notify" exec_label="none" />
-		<filesystem path="/usr/bin/e_dbus_ofono_test" exec_label="none" />
-		<filesystem path="/usr/bin/e_dbus_test" exec_label="none" />
-		<filesystem path="/usr/bin/e_dbus_test_client" exec_label="none" />
-		<filesystem path="/usr/bin/e_dbus_ukit_test" exec_label="none" />
-		<filesystem path="/usr/bin/e-notify-send" exec_label="none" />
-	</assign>
 </manifest>

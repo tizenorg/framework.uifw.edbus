@@ -161,6 +161,7 @@ e_dbus_signal_handler_add(E_DBus_Connection *conn, const char *sender, const cha
        data_cb->sh = sh;
        sh->get_name_owner_pending =
          e_dbus_get_name_owner(conn, sender, cb_name_owner, data_cb);
+       free(data_cb);
     }
   else if (sender) sh->owner = strdup(sender);
 

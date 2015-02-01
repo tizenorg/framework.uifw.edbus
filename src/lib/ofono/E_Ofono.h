@@ -9,7 +9,9 @@
 #include <E_DBus.h>
 
 /**
+ * @internal
  * @defgroup EOfono_Group EOfono
+ * @ingroup EDbus_Group
  *
  * @{
  */

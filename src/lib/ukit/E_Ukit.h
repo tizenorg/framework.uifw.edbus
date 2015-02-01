@@ -5,7 +5,9 @@
 #include <E_DBus.h>
 
 /**
+ * @internal
  * @defgroup EUkit_Group EUkit
+ * @ingroup EDbus_Group
  *
  * @{
  */

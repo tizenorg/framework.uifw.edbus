@@ -9,7 +9,9 @@
 #include <E_DBus.h>
 
 /**
+ * @internal
  * @defgroup EConnman_Group EConnman
+ * @ingroup EDbus_Group
  *
  * Currently supporting upstream API version 0.75 and later.
  *
