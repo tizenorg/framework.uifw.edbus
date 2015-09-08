@@ -101,8 +101,8 @@ e_dbus_signal_handler_add(E_DBus_Connection *conn, const char *sender, const cha
 {
   E_DBus_Signal_Handler *sh;
   Eina_Strbuf *match;
-  DBusError err;
 
+  EINA_SAFETY_ON_NULL_RETURN_VAL(conn, NULL);
   sh = calloc(1, sizeof(E_DBus_Signal_Handler));
   if (!sh)
     {
@@ -129,8 +129,7 @@ e_dbus_signal_handler_add(E_DBus_Connection *conn, const char *sender, const cha
   sh->data = data;
   sh->delete_me = 0;
 
-  dbus_error_init(&err);
-  dbus_bus_add_match(conn->conn, sh->match, &err);
+  dbus_bus_add_match(conn->conn, sh->match, NULL);
 
   if (!conn->signal_handlers) conn->signal_dispatcher = cb_signal_dispatcher;
 
@@ -162,6 +161,7 @@ e_dbus_signal_handler_add(E_DBus_Connection *conn, const char *sender, const cha
        data_cb->sh = sh;
        sh->get_name_owner_pending =
          e_dbus_get_name_owner(conn, sender, cb_name_owner, data_cb);
+       free(data_cb);
     }
   else if (sender) sh->owner = strdup(sender);
 
@@ -176,7 +176,7 @@ static int e_dbus_handler_deletions = 0;
 EAPI void
 e_dbus_signal_handler_del(E_DBus_Connection *conn, E_DBus_Signal_Handler *sh)
 {
-   if (!sh) return;
+   if ((!conn) || (!sh)) return;
 
    if (sh->get_name_owner_pending)
      {

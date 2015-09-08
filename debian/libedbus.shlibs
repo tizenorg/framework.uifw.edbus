@@ -1,7 +1,0 @@
-libedbus 1 libedbus (>= 0.5.0.060+svn20100304)
-libehal 1 libedbus (>= 0.5.0.060+svn20100304)
-libenotify 1 libedbus (>= 0.5.0.060+svn20100304)
-libebluez 1 libedbus (>= 0.5.0.060+svn20100304)
-libeofono 1 libedbus (>= 0.5.0.060+svn20100304)
-libeukit 1 libedbus (>= 0.5.0.060+svn20100304)
-libeconnman0_7x 1 libedbus (>= 0.5.0.060+svn20100304)

@@ -38,7 +38,10 @@ method_notify(E_DBus_Object *obj, DBusMessage *message)
    if (ndaemon->func.notify)
      id = ndaemon->func.notify(ndaemon, n);
    else
-     return dbus_message_new_error(message, E_NOTIFICATION_INTERFACE ".Unimplemented", "This functionality has not yet been implemented");
+     {
+        e_notification_unref(n);
+        return dbus_message_new_error(message, E_NOTIFICATION_INTERFACE ".Unimplemented", "This functionality has not yet been implemented");
+     }
 
    e_notification_unref(n);
    return e_notify_marshal_notify_return(message, id);

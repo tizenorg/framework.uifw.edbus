@@ -9,7 +9,9 @@
 #include <E_DBus.h>
 
 /**
+ * @internal
  * @defgroup EBluez_Group EBluez
+ * @ingroup EDbus_Group
  *
  * @{
  */

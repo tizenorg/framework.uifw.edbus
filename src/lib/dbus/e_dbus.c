@@ -15,7 +15,7 @@ EAPI E_DBus_Version *e_dbus_version = &_version;
 #define NUM_BUS_TYPES 3
 
 /*
- * TODO: 
+ * TODO:
  *  listen for disconnected signal and clean up?
  */
 int _e_dbus_log_dom = -1;
@@ -125,7 +125,7 @@ static void
 e_dbus_handler_data_free(void *data)
 {
   E_DBus_Handler_Data *hd = data;
-  
+
   DBG("e_dbus_handler_data_free");
   if (hd->fd_handler)
   {
@@ -182,9 +182,8 @@ e_dbus_connection_new(DBusConnection *conn)
 }
 
 static void
-e_dbus_connection_free(void *data)
+e_dbus_connection_free(E_DBus_Connection *cd)
 {
-  E_DBus_Connection *cd = data;
   Ecore_Fd_Handler *fd_handler;
   Ecore_Timer *timer;
   DBG("e_dbus_connection free!");
@@ -217,7 +216,7 @@ cb_dispatch_status(DBusConnection *conn __UNUSED__, DBusDispatchStatus new_statu
 
   if (new_status == DBUS_DISPATCH_DATA_REMAINS && !cd->idler)
      cd->idler = ecore_idler_add(e_dbus_idler, cd);
-  else if (new_status != DBUS_DISPATCH_DATA_REMAINS && cd->idler) 
+  else if (new_status != DBUS_DISPATCH_DATA_REMAINS && cd->idler)
     {
        ecore_idler_del(cd->idler);
        cd->idler = NULL;
@@ -252,12 +251,12 @@ e_dbus_timeout_data_free(void *timeout_data)
   free(td);
 }
 
-static dbus_bool_t 
+static dbus_bool_t
 cb_timeout_add(DBusTimeout *timeout, void *data)
 {
   E_DBus_Connection *cd;
   E_DBus_Timeout_Data *td;
-  
+
   cd = data;
   DBG("timeout add!");
   td = calloc(1, sizeof(E_DBus_Timeout_Data));
@@ -281,7 +280,7 @@ cb_timeout_del(DBusTimeout *timeout, void *data __UNUSED__)
 
   td = (E_DBus_Timeout_Data *)dbus_timeout_get_data(timeout);
 
-  if (td->handler) 
+  if (td->handler)
   {
     td->cd->timeouts = eina_list_remove(td->cd->timeouts, td->handler);
     ecore_timer_del(td->handler);
@@ -313,7 +312,7 @@ cb_timeout_toggle(DBusTimeout *timeout, void *data __UNUSED__)
 
 }
 
-static dbus_bool_t 
+static dbus_bool_t
 cb_watch_add(DBusWatch *watch, void *data)
 {
   E_DBus_Connection *cd;
@@ -436,7 +435,7 @@ e_dbus_bus_get(DBusBusType type)
   /* each app only needs a single connection to either bus */
   if (type == DBUS_BUS_SYSTEM || type == DBUS_BUS_SESSION)
   {
-    if (shared_connections[type]) 
+    if (shared_connections[type])
     {
       e_dbus_connection_ref(shared_connections[type]);
       return shared_connections[type];
@@ -484,7 +483,7 @@ e_dbus_connection_setup(DBusConnection *conn)
   dbus_connection_set_exit_on_disconnect(cd->conn, EINA_FALSE);
   dbus_connection_allocate_data_slot(&connection_slot);
 
-  dbus_connection_set_data(cd->conn, connection_slot, (void *)cd, e_dbus_connection_free);
+  dbus_connection_set_data(cd->conn, connection_slot, (void *)cd, NULL);
   dbus_connection_set_watch_functions(cd->conn,
                                       cb_watch_add,
                                       cb_watch_del,
@@ -511,6 +510,7 @@ e_dbus_connection_setup(DBusConnection *conn)
 EAPI void
 e_dbus_connection_close(E_DBus_Connection *conn)
 {
+  if (!conn) return;
   DBG("e_dbus_connection_close");
 
   if (e_dbus_idler_active)
@@ -545,6 +545,7 @@ e_dbus_connection_close(E_DBus_Connection *conn)
 
   dbus_connection_close(conn->conn);
   dbus_connection_unref(conn->conn);
+  e_dbus_connection_free(conn);
 
   // Note: the E_DBus_Connection gets freed when the dbus_connection is cleaned up by the previous unref
 }
@@ -552,12 +553,14 @@ e_dbus_connection_close(E_DBus_Connection *conn)
 EAPI void
 e_dbus_connection_ref(E_DBus_Connection *conn)
 {
+  EINA_SAFETY_ON_NULL_RETURN(conn);
   conn->refcount++;
 }
 
 DBusConnection *
 e_dbus_connection_dbus_connection_get(E_DBus_Connection *conn)
 {
+  EINA_SAFETY_ON_NULL_RETURN_VAL(conn, NULL);
   return conn->conn;
 }
 
@@ -566,7 +569,7 @@ e_dbus_init(void)
 {
   if (++_edbus_init_count != 1)
     return _edbus_init_count;
-  
+
   if (!eina_init())
     {
       fprintf(stderr,"E-dbus: Enable to initialize eina\n");
@@ -606,6 +609,19 @@ e_dbus_shutdown(void)
      }
    if (--_edbus_init_count)
     return _edbus_init_count;
+
+   // FIXME: this is workaround
+   while  (shared_connections[DBUS_BUS_SESSION] &&
+           shared_connections[DBUS_BUS_SESSION]->refcount >= 1)
+     {
+        e_dbus_connection_close(shared_connections[DBUS_BUS_SESSION]);
+     }
+   // FIXME: this is workaround
+   while (shared_connections[DBUS_BUS_SYSTEM] &&
+          shared_connections[DBUS_BUS_SYSTEM]->refcount >= 1)
+     {
+        e_dbus_connection_close(shared_connections[DBUS_BUS_SYSTEM]);
+     }
 
   e_dbus_object_shutdown();
   ecore_shutdown();

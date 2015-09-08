@@ -1383,13 +1383,12 @@ _on_cmd_service_ipv4_configure_manual(__UNUSED__ char *cmd, char *args)
    address = next_args;
    next_args = _tok(next_args);
    if (next_args)
-      netmask = next_args;
-
-   next_args = _tok(next_args);
-   if (next_args)
      {
-	gateway = next_args;
-	_tok(next_args);
+        netmask = next_args;
+
+        next_args = _tok(next_args);
+        gateway = next_args;
+        _tok(next_args);
      }
 
    e = e_connman_service_get(path);

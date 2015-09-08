@@ -62,8 +62,9 @@ cb_pending(DBusPendingCall *pending, void *user_data)
 EAPI DBusPendingCall *
 e_dbus_message_send(E_DBus_Connection *conn, DBusMessage *msg, E_DBus_Method_Return_Cb cb_return, int timeout, void *data)
 {
-  DBusPendingCall *pending;
+  DBusPendingCall *pending = NULL;
 
+  EINA_SAFETY_ON_NULL_RETURN_VAL(conn, NULL);
   if (!dbus_connection_send_with_reply(conn->conn, msg, &pending, timeout))
     return NULL;
 
@@ -72,15 +73,18 @@ e_dbus_message_send(E_DBus_Connection *conn, DBusMessage *msg, E_DBus_Method_Ret
     E_DBus_Pending_Call_Data *pdata;
 
     pdata = malloc(sizeof(E_DBus_Pending_Call_Data));
-    pdata->cb_return = cb_return;
-    pdata->data = data;
-
-    if (!dbus_pending_call_set_notify(pending, cb_pending, pdata, free))
+    if (pdata)
     {
-      free(pdata);
-      dbus_message_unref(msg);
-      dbus_pending_call_cancel(pending);
-      return NULL;
+      pdata->cb_return = cb_return;
+      pdata->data = data;
+
+      if (!dbus_pending_call_set_notify(pending, cb_pending, pdata, free))
+      {
+        free(pdata);
+        dbus_message_unref(msg);
+        dbus_pending_call_cancel(pending);
+        return NULL;
+      }
     }
   }
 
@@ -114,6 +118,13 @@ EAPI DBusPendingCall *
 e_dbus_method_call_send(E_DBus_Connection *conn, DBusMessage *msg, E_DBus_Unmarshal_Func unmarshal_func, E_DBus_Callback_Func cb_func, E_DBus_Free_Func free_func, int timeout, void *data)
 {
   E_DBus_Callback *cb;
+  DBusPendingCall *ret = NULL;
+
+  EINA_SAFETY_ON_NULL_RETURN_VAL(conn, NULL);
   cb = e_dbus_callback_new(cb_func, unmarshal_func, free_func, data);
-  return e_dbus_message_send(conn, msg, cb_method_call, timeout, cb);
+  ret = e_dbus_message_send(conn, msg, cb_method_call, timeout, cb);
+
+  e_dbus_callback_free(cb);
+
+  return ret;
 }

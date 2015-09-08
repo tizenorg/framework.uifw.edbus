@@ -5,7 +5,9 @@
 #include <E_DBus.h>
 
 /**
+ * @internal
  * @defgroup EHal_Group EHal
+ * @ingroup EDbus_Group
  *
  * @{
  */
