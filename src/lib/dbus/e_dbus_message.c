@@ -118,13 +118,8 @@ EAPI DBusPendingCall *
 e_dbus_method_call_send(E_DBus_Connection *conn, DBusMessage *msg, E_DBus_Unmarshal_Func unmarshal_func, E_DBus_Callback_Func cb_func, E_DBus_Free_Func free_func, int timeout, void *data)
 {
   E_DBus_Callback *cb;
-  DBusPendingCall *ret = NULL;
 
   EINA_SAFETY_ON_NULL_RETURN_VAL(conn, NULL);
   cb = e_dbus_callback_new(cb_func, unmarshal_func, free_func, data);
-  ret = e_dbus_message_send(conn, msg, cb_method_call, timeout, cb);
-
-  e_dbus_callback_free(cb);
-
-  return ret;
+  return e_dbus_message_send(conn, msg, cb_method_call, timeout, cb);
 }

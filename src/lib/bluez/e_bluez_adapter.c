@@ -45,7 +45,6 @@ _device_found_callback(void *data, DBusMessage *msg)
    t = dbus_message_iter_get_arg_type(&itr);
    if (!_dbus_iter_type_check(t, DBUS_TYPE_STRING))
      {
-        free(device);
         ERR("missing device name in DeviceFound");
         return;
      }
@@ -56,7 +55,6 @@ _device_found_callback(void *data, DBusMessage *msg)
    t = dbus_message_iter_get_arg_type(&itr);
    if (!_dbus_iter_type_check(t, DBUS_TYPE_ARRAY))
      {
-        free(device);
         ERR("missing array in DeviceFound");
         return;
      }

@@ -29,7 +29,7 @@ static E_DBus_Connection *shared_connections[2] = {NULL, NULL};
 
 typedef struct E_DBus_Handler_Data E_DBus_Handler_Data;
 typedef struct E_DBus_Timeout_Data E_DBus_Timeout_Data;
-
+typedef struct E_DBus_Event E_DBus_Event;
 
 struct E_DBus_Handler_Data
 {
@@ -46,6 +46,12 @@ struct E_DBus_Timeout_Data
   DBusTimeout *timeout;
   E_DBus_Connection *cd;
   int interval;
+};
+
+struct E_DBus_Event
+{
+   Ecore_Event *event;
+   DBusMessage *message;
 };
 
 static Eina_Bool e_dbus_idler(void *data);
@@ -354,6 +360,23 @@ cb_watch_toggle(DBusWatch *watch, void *data __UNUSED__)
 static void
 e_dbus_message_free(void *data __UNUSED__, void *message)
 {
+  E_DBus_Connection *cd = data;
+  if (_edbus_init_count <= 0) return;
+  if (cd)
+    {
+       Eina_List *l = NULL, *l_next = NULL;
+       E_DBus_Event *de = NULL;
+
+       EINA_LIST_FOREACH_SAFE(cd->events, l, l_next, de)
+         {
+            if (de->message == message)
+              {
+                 cd->events = eina_list_remove(cd->events, de);
+                 free(de);
+                 break;
+              }
+         }
+    }
   dbus_message_unref(message);
 }
 
@@ -384,7 +407,10 @@ e_dbus_filter(DBusConnection *conn __UNUSED__, DBusMessage *message, void *user_
     case DBUS_MESSAGE_TYPE_SIGNAL:
       dbus_message_ref(message);
       if (cd->signal_dispatcher) cd->signal_dispatcher(cd, message);
-      ecore_event_add(E_DBUS_EVENT_SIGNAL, message, e_dbus_message_free, NULL);
+      E_DBus_Event *de = calloc(1, sizeof(E_DBus_Event));
+      de->event = ecore_event_add(E_DBUS_EVENT_SIGNAL, message, e_dbus_message_free, cd);
+      de->message = message;
+      cd->events = eina_list_append(cd->events, de);
       break;
     default:
       break;
@@ -511,6 +537,8 @@ EAPI void
 e_dbus_connection_close(E_DBus_Connection *conn)
 {
   if (!conn) return;
+
+  E_DBus_Event *de;
   DBG("e_dbus_connection_close");
 
   if (e_dbus_idler_active)
@@ -522,6 +550,11 @@ e_dbus_connection_close(E_DBus_Connection *conn)
 
   dbus_connection_free_data_slot(&connection_slot);
   dbus_connection_remove_filter(conn->conn, e_dbus_filter, conn);
+  EINA_LIST_FREE(conn->events, de)
+    {
+       ecore_event_del(de->event);
+       free(de);
+    }
   dbus_connection_set_watch_functions (conn->conn,
                                        NULL,
                                        NULL,

@@ -1,6 +1,6 @@
 Name:       edbus
 Summary:    D-Bus and HAL wrapper libraries for EFL
-Version:    1.6.0+svn.76526slp2+build10
+Version:    1.6.0+svn.76526slp2+build11
 Release:    1
 Group:      System/Libraries
 License:    BSD 2-Clause
